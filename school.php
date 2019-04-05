@@ -1,4 +1,4 @@
-<?php 
+<?php
 if(!isset($_REQUEST['term'])){
     echo("ERROR");
     return ;
@@ -12,5 +12,5 @@ $retval = array();
 while ( $row = $stmt->fetch(PDO::FETCH_ASSOC) ) {
   $retval[] = $row['name'];
 }
-
+header('Content-Type: application/json; charset=utf-8');
 echo(json_encode($retval, JSON_PRETTY_PRINT));

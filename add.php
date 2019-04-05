@@ -1,4 +1,5 @@
 <?php
+//start session
 session_start();
 if(!(isset($_SESSION['name']) && isset($_SESSION['user_id']))){
   die('ACCESS DENIED');
@@ -6,15 +7,17 @@ if(!(isset($_SESSION['name']) && isset($_SESSION['user_id']))){
 }
 require_once "functions.php";
 
+//check if cancel was clicked
 if(isset($_POST['cancel'])){
   return go_to_url('index.php');
 }
 //processing POST data
 if(check_if_set()){
-    //chech if the profile entries and the position entries are not empty
+    //chech if the profile entries , the education entries and the position entries are not empty
     if(($msg=check_content()) !== true){
     	return go_to_url('add.php', $msg, false);
     }
+    //preparing for data insertion
     $user_entry = array(':fn' => $_POST['first_name'],
                         ':ln' => $_POST['last_name'],
                         ':em' => $_POST['email'],
@@ -25,7 +28,8 @@ if(check_if_set()){
     $stmt = $pdo->prepare('INSERT INTO Profile(user_id, first_name, last_name, email, headline, summary) VALUES(:uid, :fn, :ln, :em, :hl, :sm)');
     $user_entry[':uid'] = $_SESSION['user_id'];
     if($stmt->execute($user_entry) === false){
-	return go_to_url('index.php', 'Error while adding new data', false);
+      //if the insertion was not successful for wharever reason we display an error
+    	return go_to_url('index.php', 'Error while adding new data', false);
     }
 
     $profile_id = $pdo->lastInsertId();
@@ -53,31 +57,7 @@ if(check_if_set()){
   <body>
     <h1>Adding Profile for <?= htmlentities($_SESSION['name']) ?></h1>
     <?php flash_msg(); ?>
-    <form class="" method="post">
-      <p>
-        <label for="first_name">First Name: </label><input type="text" name="first_name" size="30">
-      </p>
-      <p>
-        <label for="last_name">Last Name: </label><input type="text" name="last_name" size="30">
-      </p>
-      <p>
-        <label for="email">Email: </label><input type="text" name="email" size="60">
-      </p>
-      <p>
-        <label for="headline">Headline: </label><input type="text" name="headline" size="80">
-      </p>
-      <p>
-        Summary:<br>
-        <textarea name="summary" rows="8" cols="80"></textarea>
-      </p>
-	<p>Education: <input id="addEdu" type="submit" value="+"></p>
-	<div id="edu_fields"></div>
-	<p>Position: <input id="addPos" type="submit" value="+"></p>
-	<div id="position_fields"></div>
-      <p>
-        <input type="submit" value="Add">
-        <input type="submit" name="cancel" value="Cancel">
-      </p>
+    <?php profile_form() ?>
 	<script type="text/javascript">
     //Position's code
     var pos_counter = 0;
@@ -137,6 +117,5 @@ if(check_if_set()){
     window.console && console.log($('.school_input'));
     $('.school_ui-autocomplete-input').autocomplete({source:'school.php'});
 	</script>
-    </form>
   </body>
 </html>

@@ -181,7 +181,7 @@ session_start();
   <head>
     <?php require_once "boot_strap.php" ?>
     <meta charset="utf-8">
-    <title>Ilias Eloufir's Resume Registry f08c6451</title>
+    <title>Ilias Eloufir's Resume Registry 02ddce85</title>
   </head>
   <body>
     <h1>Ilias Eloufir's Resume Registry</h1>

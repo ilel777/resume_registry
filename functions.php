@@ -1,4 +1,6 @@
-<?php function flash_msg(){ ?>
+<?php
+//print a flash message on the screen
+function flash_msg(){ ?>
   <?php if(isset($_SESSION['success'])): ?>
     <p style="color: green"><?= htmlentities($_SESSION['success']) ?></p>
     <?php unset($_SESSION['success']); ?>
@@ -8,7 +10,11 @@
   <?php endif; ?>
 <?php } ?>
 
-<?php function print_table($pdo,$action_column){
+<?php
+//print a table of profiles contained in the database
+//if $action_column is set to true adds a link to edit and delete profiles associated with the current logged user
+//otherwise allows the user to view the profiles only
+function print_table($pdo,$action_column){
   $stmt = $pdo->query('SELECT * FROM Profile');
   $row = false;
   ?>
@@ -33,6 +39,7 @@
 <?php } ?>
 
 <?php
+//redirect to a specific page and sets a success or failure message
   function go_to_url($url, $msg = '', $success = true){
     error_log("edit.php ".$url." ".$msg." ".$success);
     if(strlen($msg) > 0){
@@ -48,7 +55,9 @@
   }
 ?>
 
-<?php function profile_table($data = false,$profile_id){ ?>
+<?php
+//create the profile form and fills it with the available data
+function profile_form($data = false){ ?>
     <form class="" method="post">
       <p>
         <label for="first_name">First Name: </label><input type="text" name="first_name" size="30" value=<?= $data ? htmlentities($data['First Name']) : '' ?>>
@@ -75,14 +84,17 @@
 	<?php position_form(isset($data['Position'])? $data['Position']:false); ?>
 
         <?php if ($data !== false): ?>
-          <input type="hidden" name="profile_id" value=<?= htmlentities($profile_id) ?>>
+          <input type="hidden" name="profile_id" value=<?= htmlentities($_GET['profile_id']) ?>>
         <?php endif; ?>
         <input type="submit" value=<?= $data ? 'Save' : 'Add' ?>>
         <input type="submit" name="cancel" value="Cancel">
       </p>
+    </form>
 <?php } ?>
 
-<?php function check_if_set(){
+<?php
+//check if all the required variables are set
+function check_if_set(){
     if(!(isset($_POST['first_name']) && isset($_POST['last_name']) && isset($_POST['email']) && isset($_POST['headline']) && isset($_POST['summary']))){
 	return false;
     }
@@ -91,7 +103,9 @@
     }
 }?>
 
-<?php function check_content(){
+<?php
+//check the validity of the content submited by the user
+function check_content(){
     if(!(strlen($_POST['first_name']) > 0 && strlen($_POST['last_name']) > 0 && strlen($_POST['email']) > 0 && strlen($_POST['headline']) > 0 && strlen($_POST['summary']) > 0)){
 	return 'All fields are required';
     }
@@ -129,7 +143,9 @@
     return true;
 }
 ?>
-<?php function position_form($data){
+<?php
+//create the form fields for position entries and fills them with available data
+function position_form($data){
   $pos_count = 0; ?>
   <div id="position_fields">
     <?php if($data !== false): ?>
@@ -147,18 +163,24 @@
   </div>
 <?php } ?>
 
-<?php function education_form($data){
+<?php
+//create the form fields for position entries and fill them with available
+function education_form($data){
+  error_log("functions.php : ".print_r($data,true));
     $edu_cout = 0;?>
     <div id="edu_fields">
     <?php if($data !== false): ?>
     <?php foreach ($data as $row): ?>
-      <div id=<?= 'edu_'.($edu_cout+1) ?> class='education'>
-      <p>Year: 
-	<input type="text" name=<?= 'edu_year'.($edu_cout)?> value=<?= htmlentities($row['year'])?>>
+      <?php
+  error_log("functions.php : ".print_r($row,true));
+       ?>
+      <div id=<?= 'education_'.($edu_cout+1) ?> class='education'>
+      <p>Year:
+	<input type="text" name=<?= 'edu_year'.($edu_cout+1)?> value=<?= htmlentities($row['year'])?>>
 	<input class="del_edu" type="button" value="-">
       </p>
-	<p>School: 
-	<input class="school_ui-autocomplete-input" type="text" value=<?= htmlentities($row['name']) ?>  size="80" name=<?= 'edu_school'.($edu_cout) ?>  autocomplete="off">
+	<p>School:
+	<input class="school_ui-autocomplete-input" type="text" value="<?= htmlentities($row['name']) ?>"  size="80" name=<?= 'edu_school'.($edu_cout+1) ?>  autocomplete="off">
 	</p>
       </div>
       <?php $edu_cout += 1;?>
@@ -167,7 +189,10 @@
     </div>
 <?php } ?>
 
-<?php function get_data($pdo, $profile_id, $edit=false){
+<?php
+//get a profile data
+//if editable is set to true ,only retrieves data that can be edited by the currently logged user
+function get_data($pdo, $profile_id, $editable=false){
     $query_str = "SELECT first_name AS 'First Name',
     last_name AS 'Last Name',
     email AS Email,
@@ -175,7 +200,7 @@
     summary AS Summary
     FROM Profile WHERE profile_id = :pid";
     $params = array(':pid' => $profile_id);
-    if($edit){
+    if($editable){
 	$query_str.=" AND user_id = :uid";
 	$params[':uid'] = $_SESSION['user_id'];
     }
@@ -189,19 +214,21 @@
   $stmt = $pdo->prepare("SELECT * FROM Position WHERE profile_id = :id ORDER BY rank");
   $stmt->execute(array(':id' => $profile_id));
   $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  if($data !== false){
+  if(count($data) > 0){
       $row['Position'] = $data;
   }
   //get education data
   $stmt = $pdo->prepare("SELECT * FROM Education JOIN Institution ON Education.institution_id = Institution.institution_id WHERE profile_id = :id ORDER BY rank");
   $stmt->execute(array(':id' => $profile_id));
   $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  if($data !== false){
+  if(count($data) > 0){
+    error_log("functions.php: data = ".print_r($data,true));
       $row['Education'] = $data;
   }
   return $row;
 }
 
+//insert position entries in the database
 function insert_positions($pdo,$profile_id){
     $rank = 1;
     for($i = 1; $i<10; $i++){
@@ -218,6 +245,7 @@ function insert_positions($pdo,$profile_id){
     return true;
 }
 
+//insert education entries and newly added institutions in the database
 function insert_educations($pdo,$profile_id){
     $rank = 1;
     for($i = 1; $i<10; $i++){

@@ -1,4 +1,6 @@
-<?php session_start();
+<?php
+//start session
+session_start();
 if(!(isset($_SESSION['name']) && isset($_SESSION['user_id']))){
   die('ACCESS DENIED');
   return;
@@ -16,12 +18,12 @@ if(isset($_POST['cancel'])){
 
 require_once "pdo.php";
 
-$url = 'edit.php?profile_id='.urldecode($_GET['profile_id']);
 //processing POST data
 if(check_if_set() && isset($_POST['profile_id'])){
     //chech if the profile entries and the position entries are not empty
     if(($msg=check_content()) !== true){
-    	return go_to_url('add.php', $msg, false);
+      $url = 'edit.php?profile_id='.urlencode($_GET['profile_id']);
+    	return go_to_url($url, $msg, false);
     }
   $user_entry = array(':fn' => $_POST['first_name'],
                       ':ln' => $_POST['last_name'],
@@ -32,6 +34,7 @@ if(check_if_set() && isset($_POST['profile_id'])){
 
   $stmt = $pdo->prepare('UPDATE Profile SET first_name = :fn, last_name = :ln, email = :em, headline = :hl, summary = :sm WHERE profile_id = :id');
   if($stmt->execute($user_entry) === false){
+    //if update data failed return and display an error
     return go_to_url('index.php', 'Error while updating data', false);
   }
 
@@ -71,7 +74,7 @@ if($data === false){
   <body>
     <h1>Editing Profile for <?= htmlentities($_SESSION['name']) ?></h1>
     <?php flash_msg(); ?>
-    <?php profile_table($data, $_GET['profile_id']); ?>
+    <?php profile_form($data, $_GET['profile_id']); ?>
   </body>
   <script type="text/javascript">
     //Position's code
