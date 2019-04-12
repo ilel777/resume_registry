@@ -1,7 +1,6 @@
 <?php
 require_once "functions.php";
 session_start();
-
 /*
 source code of pdo.php:
 <?php
@@ -40,34 +39,54 @@ if($data === false){
     <title>Ilias Eloufir Profile View</title>
   </head>
   <body>
+      <div class="container">
     <h1>Profile information</h1>
-    <?php foreach ($data as $key => $value): ?>
-      <?php if($key !== 'Position' && $key !== 'Education'): ?>
-        <?php if($key == 'Headline' || $key == 'Summary'): ?>
-    	    <p><?= $key ?>:<br> <?= htmlentities($value) ?></p>
-        <?php else: ?>
-    	    <p><?= $key ?>: <?= htmlentities($value) ?></p>
-      	<?php endif; ?>
-    	<?php endif; ?>
-    <?php endforeach; ?>
-  	<?php if(isset($data['Education'])): ?>
-	    <p>Education</p>
-	    <ul>
-  		<?php foreach($data['Education'] as $pos_row): ?>
-    		<li><?= htmlentities($pos_row['year']).': '.htmlentities($pos_row['name']) ?></li>
-  		<?php endforeach; ?>
-	    </ul>
-  	<?php endif; ?>
-  	<?php if(isset($data['Position'])): ?>
-	    <p>Position</p>
-	    <ul>
-  		<?php foreach($data['Position'] as $pos_row): ?>
-    		<li><?= htmlentities($pos_row['year']).': '.htmlentities($pos_row['description']) ?></li>
-  		<?php endforeach; ?>
-	    </ul>
-  	<?php endif; ?>
+    <div id="table"></div>
     <p>
       <a href="index.php">Done</a>
     </p>
+    <script type="text/x-handlebars-template" id="profile-table-template">
+        <p>First Name: {{'First Name'}}</p>
+        <p>Last Name: {{'Last Name'}}</p>
+        <p>Email: {{Email}}</p>
+        <p>Headline:<br> {{Headline}}</p>
+        <p>Summary:<br> {{Summary}}</p>
+        {{#if Education}}
+        <p>Education:<br>
+            <ul>
+                {{#each Education}}
+                <li>{{year}}:{{name}}</li>
+                {{/each}}
+            </ul>
+
+        </p>
+        {{/if}}
+        {{#if Position}}
+        <p>Postition:<br>
+            <ul>
+                {{#each Position}}
+                <li>{{year}}:{{description}}</li>
+                {{/each}}
+            </ul>
+
+        </p>
+        {{/if}}
+    </script>
+    <script type="text/javascript">
+    console.log('peace world!1');
+     var raw_template = $('#profile-table-template').html();
+     console.log(raw_template);
+     var template = Handlebars.compile(raw_template);
+
+    $.getJSON('profile.php?profile_id='+<?= $_GET['profile_id'] ?>, function(data){
+         console.log(data);
+         console.log(template);
+         var rendered = template(data);
+         console.log(rendered);
+         console.log($('#table'));
+         $('#table').html(rendered);
+    })
+    </script>
+      </div>
   </body>
 </html>
