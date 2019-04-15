@@ -43,36 +43,56 @@ if(isset($_POST['email']) && isset($_POST['pass'])){
     <title>Ilias Eloufir's Login Page</title>
   </head>
   <body>
-    <h1>Please Log In</h1>
-    <?php flash_msg(); ?>
-    <p>
-      <form method="post">
-        <label for="email">Email</label><input type="text" name="email" id="email"><br>
-        <label for="pass">Password</label><input type="password" name="pass" id="pass"><br>
-        <input type="submit" value="Log In" onclick="return doValidate();"><input type="submit" name="cancel" value="Cancel"><br>
-      </form>
-    </p>
+    <div class="container">
+      <h1>Please Log In</h1>
+      <?php flash_msg(); ?>
+      <div class="row">
+	<form method="post">
+          <div class="form-group row">
+            <label for="emailid" class="col-md-2 col-form-label">Email</label>
+            <div class="col-md-10">
+              <input class="form-control" id="emailid" name="email" type="text" placeholder="Email" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="passwordid" class="col-md-2 col-form-label">Password</label>
+            <div class="col-md-10">
+              <input class="form-control" id="passwordid" name="pass" type="password" placeholder="Email" />
+            </div>
+          </div>
+	  <div class="form-group row">
+	    <class class="col-md-1">
+	      <button class="btn btn-primary" type="submit" onclick="return doValidate();">Log In</button>
+	    </class>
+	    <class class="col-md-11">
+	      <button class="btn btn-primary" type="submit" name="cancel">Cancel</button>
+	    </class>
+	  </div>
+	</form>
+      </div>
+    </div>
+
     <script type="text/javascript">
-      function doValidate() {
-          console.log('Validating...');
-          try {
-              addr = document.getElementById('email').value;
-              pw = document.getElementById('pass').value;
-              console.log("Validating addr="+addr+" pw="+pw);
-              if (addr == null || addr == "" || pw == null || pw == "") {
-                  alert("Both fields must be filled out");
-                  return false;
-              }
-              if ( addr.indexOf('@') == -1 ) {
-                  alert("Invalid email address");
-                  return false;
-              }
-              return true;
-          } catch(e) {
-              return false;
-          }
-          return false;
-      }
+     function doValidate() {
+       console.log('Validating...');
+       try {
+         addr = document.getElementById('emailid').value;
+         pw = document.getElementById('passwordid').value;
+         console.log("Validating addr="+addr+" pw="+pw);
+         if (addr == null || addr == "" || pw == null || pw == "") {
+           alert("Both fields must be filled out");
+           return false;
+         }
+         if ( addr.indexOf('@') == -1 ) {
+           alert("Invalid email address");
+           return false;
+         }
+         return true;
+       } catch(e) {
+         return false;
+       }
+       return false;
+     }
     </script>
   </body>
 </html>

@@ -40,19 +40,23 @@ if($data === false){
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <?php require_once "boot_strap.php" ?>
+    <?php require_once "head.php" ?>
     <meta charset="utf-8">
     <title>Ilias Eloufir' Profile Delete</title>
   </head>
   <body>
+    <div class="container">
     <h1>Deleteing Profile</h1>
     <form method="post">
       <?php foreach ($data as $key => $value): ?>
         <p><?= $key ?>: <?= htmlentities($value) ?></p>
       <?php endforeach; ?>
+      <div class="form-groop row">
       <input type="hidden" name="profile_id" value=<?= htmlentities($_GET['profile_id']) ?>>
-      <input type="submit" value="Delete">
-      <input type="submit" name="cancel" value="Cancel">
+      <button class="btn btn-info" type="submit" >Delete</button>
+      <button class="btn btn-info" type="submit" name="cancel">Cancel</button>
+      </div>
     </form>
+    </div>
   </body>
 </html>
